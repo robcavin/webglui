@@ -7,6 +7,10 @@
 
 <script type="text/javascript" src="gl-matrix/dist/gl-matrix.js"></script>
 
+<script type="text/javascript" src="WIWebGLUI.js"></script>
+<script type="text/javascript" src="WIModel.js"></script>
+<script type="text/javascript" src="WIScene.js"></script>
+
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
 
@@ -31,14 +35,32 @@
 
     function webGLStart() {
         var canvas = document.getElementById("webglui-canvas");
-        var webGLUI = WIWebGLUI(canvas);
-        initShaders();
-        initBuffers();
 
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-        gl.enable(gl.DEPTH_TEST);
+        var webGLUI = new WIWebGLUI().init(canvas);
+        var gl = webGLUI.gl;
 
-        drawScene();
+        var scene = new WIScene(webGLUI);
+
+        var triangle_verts = [
+             0.0,  1.0,  0.0,
+            -1.0, -1.0,  0.0,
+             1.0, -1.0,  0.0
+        ];
+        var triangle = new WIModel(webGLUI).init(triangle_verts, 3, 3)
+
+        var square_verts = [
+             1.0,  1.0,  0.0,
+            -1.0,  1.0,  0.0,
+             1.0, -1.0,  0.0,
+            -1.0, -1.0,  0.0
+        ];
+        var square = new WIModel(webGLUI).init(square_verts, 3, 4, gl.TRIANGLE_STRIP)
+
+        scene.addModel(square)
+        scene.addModel(triangle)
+
+        scene.update()
+        scene.draw()
     }
 
 
