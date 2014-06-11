@@ -20,7 +20,8 @@ WIScene.prototype = {
         var gl = this.gl;
 
         var pMatrix = this.pMatrix;
-        mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+        //mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+        mat4.ortho(pMatrix,0,gl.viewportWidth,gl.viewportHeight,0, 0.0,100.0)
 
         var mvMatrix = this.mvMatrix;
         mat4.identity(mvMatrix);

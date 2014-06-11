@@ -7,26 +7,43 @@
 
 <script type="text/javascript" src="gl-matrix/dist/gl-matrix.js"></script>
 
+<script type="text/javascript" src="WITypes.js"></script>
+<script type="text/javascript" src="WIColor.js"></script>
 <script type="text/javascript" src="WIWebGLUI.js"></script>
+<script type="text/javascript" src="WITexture.js"></script>
 <script type="text/javascript" src="WIModel.js"></script>
 <script type="text/javascript" src="WIScene.js"></script>
+<script type="text/javascript" src="WIView.js"></script>
+<script type="text/javascript" src="WIImageView.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
 
+    varying vec4 vVertexColor;
+    varying vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+    uniform vec4 uBackgroundColor;
+
     void main(void) {
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        vec4 texture_color = texture2D(uSampler, vTextureCoord);
+        vec3 color_rgb = texture_color.rgb*texture_color.a + uBackgroundColor.rgb*(1.0-texture_color.a);
+        gl_FragColor = vec4(color_rgb,uBackgroundColor.a);
     }
 </script>
 
 <script id="shader-vs" type="x-shader/x-vertex">
     attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
 
     uniform mat4 uMVMatrix;
     uniform mat4 uPMatrix;
 
+    varying vec2 vTextureCoord;
+
     void main(void) {
         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoord = aTextureCoord;
     }
 </script>
 
@@ -37,31 +54,27 @@
         var canvas = document.getElementById("webglui-canvas");
 
         var webGLUI = new WIWebGLUI().init(canvas);
+        window.webGLUI = webGLUI;
+
         var gl = webGLUI.gl;
 
         var scene = new WIScene(webGLUI);
 
-        var triangle_verts = [
-             0.0,  1.0,  0.0,
-            -1.0, -1.0,  0.0,
-             1.0, -1.0,  0.0
-        ];
-        var triangle = new WIModel(webGLUI).init(triangle_verts, 3, 3)
+        var image_view = new WIImageView(webGLUI);
+        image_view.setImage("nehe.gif");
+        scene.addModel(view.model);
 
-        var square_verts = [
-             1.0,  1.0,  0.0,
-            -1.0,  1.0,  0.0,
-             1.0, -1.0,  0.0,
-            -1.0, -1.0,  0.0
-        ];
-        var square = new WIModel(webGLUI).init(square_verts, 3, 4, gl.TRIANGLE_STRIP)
+        webGLUI.pushScene(scene);
 
-        scene.addModel(square)
-        scene.addModel(triangle)
-
-        scene.update()
-        scene.draw()
+        renderLoop();
     }
+
+    function renderLoop() {
+        window.requestAnimationFrame(renderLoop);
+        window.webGLUI.renderLoop();
+    }
+
+
 
 
 </script>

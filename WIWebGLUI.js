@@ -13,6 +13,8 @@ WIWebGLUI.prototype = {
 
         this.defaultShaderProgram = this.initDefaultShaders();
 
+        this.scenes = []
+
         return this;
     },
 
@@ -97,9 +99,27 @@ WIWebGLUI.prototype = {
         shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
         gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
+        shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+        gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
         shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+        shaderProgram.backgroundColorUniform = gl.getUniformLocation(shaderProgram, "uBackgroundColor");
 
         return shaderProgram;
+    },
+
+    pushScene: function(scene) {
+        this.scenes.push(scene)
+    },
+
+    renderLoop: function() {
+
+        var scene = this.scenes.pop()
+        scene.update()
+        scene.draw()
+
+        this.scenes.push(scene)
     }
 }
